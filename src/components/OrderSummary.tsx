@@ -35,7 +35,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ lineItems, subtotal, totalA
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
         {logoUrl ? (
           <>
-            <img src={logoUrl} alt={companyName} style={{ height: '32px', borderRadius: '4px' }} />
+            <img src={logoUrl} alt={companyName} style={{ height: '52px', borderRadius: '4px' }} />
             {isTestMode && (
               <span style={{ fontSize: '0.75rem', backgroundColor: '#fde68a', color: '#92400e', padding: '2px 6px', borderRadius: '4px', marginLeft: '8px', verticalAlign: 'middle', fontWeight: 600 }}>
                 MODO PRUEBA
