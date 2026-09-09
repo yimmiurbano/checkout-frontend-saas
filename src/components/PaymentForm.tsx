@@ -13,7 +13,7 @@ interface PaymentFormProps {
   amount: number;
   currency: string;
   onSuccess: (paymentId: string, customerData: Record<string, any>) => void;
-  publicApiKey: string;
+  gatewayPublicKey: string;
   companyName: string;
   companyId: string;
   config: any; // CheckoutConfig
@@ -21,7 +21,7 @@ interface PaymentFormProps {
   initialCustomerData?: Record<string, any>;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, publicApiKey, companyName, companyId, config, paymentGateways = [], initialCustomerData = {} }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, gatewayPublicKey, companyName, companyId, config, paymentGateways = [], initialCustomerData = {} }) => {
   const isCulqiActive = paymentGateways.length === 0 || paymentGateways.some((g: any) => g.gateway === 'culqi' && g.isActive);
   const isCashAppActive = paymentGateways.some((g: any) => g.gateway === 'cashapp' && g.isActive);
 
@@ -50,8 +50,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, 
   }, [initialCustomerData]);
 
   useEffect(() => {
-    if (window.Culqi && publicApiKey) {
-      window.Culqi.publicKey = publicApiKey;
+    if (window.Culqi && gatewayPublicKey) {
+      window.Culqi.publicKey = gatewayPublicKey;
       window.Culqi.settings({
         title: companyName,
         currency: currency,
@@ -79,7 +79,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, 
         alert(window.Culqi.error?.user_message || 'Hubo un error al generar el token de pago.');
       }
     };
-  }, [publicApiKey, amount, currency, companyName, onSuccess, customerData, email]);
+  }, [gatewayPublicKey, amount, currency, companyName, onSuccess, customerData, email]);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;

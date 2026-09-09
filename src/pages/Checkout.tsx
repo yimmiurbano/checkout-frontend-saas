@@ -21,7 +21,7 @@ interface SessionData {
 interface CompanyData {
   name: string;
   branding: { primaryColor: string; logoUrl?: string };
-  publicApiKey: string;
+  companyKey: string;
   paymentGateways?: any[];
   isTestMode?: boolean;
 }
@@ -117,7 +117,7 @@ const Checkout: React.FC = () => {
   }
 
   const culqiGateway = company?.paymentGateways?.find((gateway: any) => gateway.gateway === 'culqi' && gateway.isActive);
-  const culqiPublicKey = culqiGateway?.publicKey || company?.publicApiKey || '';
+  const culqiPublicKey = culqiGateway?.publicKey || '';
 
   return (
     <div className="app-container">
@@ -167,7 +167,7 @@ const Checkout: React.FC = () => {
                 amount={finalTotal} 
                 currency={session.currency}
                 onSuccess={handlePaymentSuccess}
-                publicApiKey={culqiPublicKey}
+                gatewayPublicKey={culqiPublicKey}
                 companyName={company?.name || 'Checkout'}
                 companyId={session.companyId}
                 config={config}
