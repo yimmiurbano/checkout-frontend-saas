@@ -116,6 +116,9 @@ const Checkout: React.FC = () => {
     taxLabel = tax.name;
   }
 
+  const culqiGateway = company?.paymentGateways?.find((gateway: any) => gateway.gateway === 'culqi' && gateway.isActive);
+  const culqiPublicKey = culqiGateway?.publicKey || company?.publicApiKey || '';
+
   return (
     <div className="app-container">
       {/* LEFT PANEL */}
@@ -164,7 +167,7 @@ const Checkout: React.FC = () => {
                 amount={finalTotal} 
                 currency={session.currency}
                 onSuccess={handlePaymentSuccess}
-                publicApiKey={company?.publicApiKey || ''}
+                publicApiKey={culqiPublicKey}
                 companyName={company?.name || 'Checkout'}
                 companyId={session.companyId}
                 config={config}

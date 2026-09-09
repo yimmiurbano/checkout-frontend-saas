@@ -67,8 +67,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, 
       if (window.Culqi.token) {
         const token = window.Culqi.token.id;
         console.log('Culqi Token generated:', token);
+        window.Culqi.close?.();
         onSuccess(token, { ...customerData, email });
       } else if (window.Culqi.order) {
+        window.Culqi.close?.();
+        setIsProcessing(false);
+        alert('Este método generó una orden de pago. Por ahora solo está habilitado el cargo directo con tarjeta o Yape.');
       } else {
         console.error('Culqi error:', window.Culqi.error);
         setIsProcessing(false);
@@ -130,6 +134,11 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, 
     }
     
     if (selectedMethod === 'culqi') {
+      if (!window.Culqi) {
+        alert('No pudimos cargar Culqi. Recarga la página e inténtalo nuevamente.');
+        return;
+      }
+
       setIsProcessing(true);
       window.Culqi.open();
       
