@@ -32,6 +32,16 @@ interface PaymentGatewayData {
   isActive: boolean;
 }
 
+const buildSuccessRedirectUrl = (successUrl: string, sessionId: string): string => {
+  try {
+    const url = new URL(successUrl);
+    url.searchParams.set('sessionId', sessionId);
+    return url.toString();
+  } catch {
+    return successUrl;
+  }
+};
+
 const Checkout: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const [session, setSession] = useState<SessionData | null>(null);
@@ -44,7 +54,7 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     if (isPaid && session?.successUrl) {
       const timer = setTimeout(() => {
-        window.location.href = session.successUrl;
+        window.location.href = buildSuccessRedirectUrl(session.successUrl, session.id);
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -156,7 +166,7 @@ const Checkout: React.FC = () => {
               <p style={{ fontSize: '0.9375rem', color: '#6b7280', marginBottom: '2rem', lineHeight: '1.5' }}>
                 Tu pago ha sido procesado con éxito. En unos segundos serás redirigido de vuelta al sitio web del curso.
               </p>
-              <a href={session.successUrl} className="btn-primary" style={{ textDecoration: 'none' }}>
+              <a href={buildSuccessRedirectUrl(session.successUrl, session.id)} className="btn-primary" style={{ textDecoration: 'none' }}>
                 Volver ahora
               </a>
             </div>
