@@ -18,9 +18,10 @@ interface PaymentFormProps {
   companyId: string;
   config: any; // CheckoutConfig
   paymentGateways?: any[];
+  initialCustomerData?: Record<string, any>;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, publicApiKey, companyName, companyId, config, paymentGateways = [] }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, publicApiKey, companyName, companyId, config, paymentGateways = [], initialCustomerData = {} }) => {
   const isCulqiActive = paymentGateways.length === 0 || paymentGateways.some((g: any) => g.gateway === 'culqi' && g.isActive);
   const isCashAppActive = paymentGateways.some((g: any) => g.gateway === 'cashapp' && g.isActive);
 
@@ -34,10 +35,19 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, 
     }
   }, [isCulqiActive, isCashAppActive]);
 
-  const [email, setEmail] = useState<string>('');
+  const [email, setEmail] = useState<string>(initialCustomerData.email || '');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [customerData, setCustomerData] = useState<Record<string, any>>({});
+  const [customerData, setCustomerData] = useState<Record<string, any>>(() => {
+    const { email: _email, ...rest } = initialCustomerData;
+    return rest;
+  });
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setEmail(initialCustomerData.email || '');
+    const { email: _email, ...rest } = initialCustomerData;
+    setCustomerData(rest);
+  }, [initialCustomerData]);
 
   useEffect(() => {
     if (window.Culqi && publicApiKey) {
@@ -57,7 +67,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, 
       if (window.Culqi.token) {
         const token = window.Culqi.token.id;
         console.log('Culqi Token generated:', token);
-        onSuccess(token, customerData);
+        onSuccess(token, { ...customerData, email });
       } else if (window.Culqi.order) {
       } else {
         console.error('Culqi error:', window.Culqi.error);
@@ -65,7 +75,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, 
         alert(window.Culqi.error?.user_message || 'Hubo un error al generar el token de pago.');
       }
     };
-  }, [publicApiKey, amount, currency, companyName, onSuccess, customerData]);
+  }, [publicApiKey, amount, currency, companyName, onSuccess, customerData, email]);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEmail = e.target.value;
@@ -78,7 +88,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ amount, currency, onSuccess, 
     if (newEmail && newEmail.includes('@')) {
       typingTimeoutRef.current = setTimeout(async () => {
         try {
-          const res = await axios.get(`${API_URL}/api/customers?email=${newEmail}&companyId=${companyId}`);
+          const res = await axios.get(`${API_URL}/api/customers?email=${encodeURIComponent(newEmail)}&companyId=${encodeURIComponent(companyId)}`);
           if (res.data && res.data.customFields) {
             setCustomerData(res.data.customFields);
           }
