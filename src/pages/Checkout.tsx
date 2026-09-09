@@ -15,6 +15,7 @@ interface SessionData {
   companyId: string;
   successUrl: string;
   cancelUrl: string;
+  customerData?: Record<string, any>;
 }
 
 interface CompanyData {
@@ -168,6 +169,7 @@ const Checkout: React.FC = () => {
                 companyId={session.companyId}
                 config={config}
                 paymentGateways={company?.paymentGateways}
+                initialCustomerData={session.customerData}
               />
             </>
           )}
